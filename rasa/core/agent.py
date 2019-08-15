@@ -782,7 +782,12 @@ class Agent(object):
                 "overwritten.".format(model_path)
             )
 
-    def persist(self, model_path: Text, dump_flattened_stories: bool = False) -> None:
+    def persist(
+        self,
+        model_path: Text,
+        dump_flattened_stories: bool = False,
+        replace_templates_only: bool = False,
+    ) -> None:
         """Persists this agent into a directory for later loading and usage."""
 
         if not self.is_ready():
@@ -791,11 +796,14 @@ class Agent(object):
         if not model_path.endswith("core"):
             model_path = os.path.join(model_path, "core")
 
-        self._clear_model_directory(model_path)
-
-        self.policy_ensemble.persist(model_path, dump_flattened_stories)
-        self.domain.persist(os.path.join(model_path, DEFAULT_DOMAIN_PATH))
-        self.domain.persist_specification(model_path)
+        if replace_templates_only:
+            self.domain.persist(os.path.join(model_path, DEFAULT_DOMAIN_PATH))
+            self.domain.persist_specification(model_path)
+        else:
+            self._clear_model_directory(model_path)
+            self.policy_ensemble.persist(model_path, dump_flattened_stories)
+            self.domain.persist(os.path.join(model_path, DEFAULT_DOMAIN_PATH))
+            self.domain.persist_specification(model_path)
 
         logger.info("Persisted model to '{}'".format(os.path.abspath(model_path)))
 

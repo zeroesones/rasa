@@ -27,6 +27,7 @@ async def train(
     dump_stories: bool = False,
     policy_config: Optional[Union[Text, Dict]] = None,
     exclusion_percentage: int = None,
+    replace_templates_only: bool = False,
     kwargs: Optional[Dict] = None,
 ):
     from rasa.core.agent import Agent
@@ -49,22 +50,25 @@ async def train(
         policies=policies,
     )
 
-    data_load_args, kwargs = utils.extract_args(
-        kwargs,
-        {
-            "use_story_concatenation",
-            "unique_last_num_states",
-            "augmentation_factor",
-            "remove_duplicates",
-            "debug_plots",
-        },
-    )
+    if not replace_templates_only:
+        data_load_args, kwargs = utils.extract_args(
+            kwargs,
+            {
+                "use_story_concatenation",
+                "unique_last_num_states",
+                "augmentation_factor",
+                "remove_duplicates",
+                "debug_plots",
+            },
+        )
+        training_data = await agent.load_data(
+            training_resource,
+            exclusion_percentage=exclusion_percentage,
+            **data_load_args
+        )
+        agent.train(training_data, **kwargs)
 
-    training_data = await agent.load_data(
-        training_resource, exclusion_percentage=exclusion_percentage, **data_load_args
-    )
-    agent.train(training_data, **kwargs)
-    agent.persist(output_path, dump_stories)
+    agent.persist(output_path, dump_stories, replace_templates_only)
 
     return agent
 

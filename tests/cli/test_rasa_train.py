@@ -132,6 +132,16 @@ def test_train_skip_on_model_not_changed(run_in_default_project):
     assert file_name == files[0]
 
 
+def test_replace_templates_only(run_in_default_project):
+    temp_dir = os.getcwd()
+
+    assert os.path.exists(os.path.join(temp_dir, "models"))
+    files = io_utils.list_files(os.path.join(temp_dir, "models"))
+    assert len(files) == 1
+
+    run_in_default_project("train")
+
+
 def test_train_force(run_in_default_project):
     temp_dir = os.getcwd()
 
