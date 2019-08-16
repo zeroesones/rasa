@@ -167,7 +167,7 @@ at a time):
 .. note::
    Unlike regular stories, checkpoints are not restricted to starting with an
    input from the user. As long as the checkpoint is inserted at the right points
-   in the main stories, the first event can be a bot utterance or an utterance
+   in the main stories, the first event can be an action or an utterance
    as well.
 
 
